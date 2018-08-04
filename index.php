@@ -1,21 +1,25 @@
 <?php
-// require_once('./core/Test.php');
-// $configJson = file_get_contents('./config.json');
-// $config = json_decode($configJson, true);
+date_default_timezone_set('UTC');
+require_once('./Controller.class.php');
 
-// $test = new \Core\SQLConnector();
-// echo '$test value: ', $test->value;
+$controller = new Controller();
+$taskData = $controller->getData();
+$isEdit = false;
+$editedId;
+$editedDescription;
 
-echo '<pre>', var_dump($_POST), '</pre>';
-if (!empty($_POST['new-task'])) {
-  $newTask = $_POST['new-task'];
-
-} else if (!empty($_POST['sort-by'])) {
-  $sortBy = $_POST['sort-by'];
-
+if (!empty($_GET['action']) && $_GET['action'] === 'change') {
+  $isEdit = true;
+  $editedId = $_GET['id'];
 }
 
-// if ()
+if ($isEdit) {
+  foreach ($taskData as $task) {
+    if ((int) $task['id'] === (int) $editedId) {
+      $editedDescription = $task['description'];
+    }
+  }
+}
 
 ?>
 
@@ -33,14 +37,38 @@ if (!empty($_POST['new-task'])) {
   
 <div style="display: flex; justify-content: space-around;">
   <form method="POST">
-    <input type="text" name="new-task" placeholder="Описание задачи">
-    <input type="submit" placeholder="Добавить">
+    <?php if ($isEdit): ?>
+      <input 
+        type="text" 
+        name="description" 
+        placeholder="Описание задачи"
+        value="<?php echo $editedDescription; ?>"
+      >
+      <input type="hidden" name="id" value="<?php echo $editedId;?>">
+      <input type="submit" value="Сохранить">
+    <?php else: ?>
+      <input type="text" name="new-task" placeholder="Описание задачи">
+      <input type="submit" value="Добавить">
+    <?php endif; ?>
   </form>
 
 
   <form method="POST">
-    <input type="text" name="new-task" placeholder="Описание задачи">
-    <input type="submit" placeholder="Добавить">
+    Сортировать по: 
+    <select name="sort-by">
+      <option value="date_added">
+        Дате добавления
+      </option>
+    
+      <option value="is_done">
+        Статусу
+      </option>
+    
+      <option value="description">
+        Описанию
+      </option>
+    </select>
+    <input type="submit" value="Отсортировать">
   </form>
 </div>
 
@@ -57,13 +85,13 @@ if (!empty($_POST['new-task'])) {
   <tbody>
     <?php foreach($taskData as $task): ?>
       <tr>
-        <td><?php echo $task['title'];?></td>
-        <td><?php echo $task['date'];?></td>
-        <td><?php echo $task['status'];?></td>
+        <td><?php echo $task['description']; ?></td>
+        <td><?php echo $task['date_added']; ?></td>
+        <td><?php echo $task['is_done'] ? 'Выполнено' : 'Не выполнено'; ?></td>
         <td>
-          <a href="?id=<?php $task['id']?>&action=change">Изменить</a> 
-          <a href="?id=<?php $task['id']?>&action=done">Выполнить</a>
-          <a href="?id=<?php $task['id']?>&action=delete">Удалить</a>
+          <a href="?id=<?php echo $task['id'] ?>&action=change">Изменить</a> 
+          <a href="?id=<?php echo $task['id'] ?>&action=done">Выполнить</a>
+          <a href="?id=<?php echo $task['id'] ?>&action=delete">Удалить</a>
         </td>
       </tr>
     <?php endforeach; ?>
