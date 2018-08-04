@@ -9,7 +9,7 @@ try {
 
     public function __construct() 
     {
-      $configJson = file_get_contents('./config.local.json');
+      $configJson = file_get_contents('./config.json');
       $this->config = json_decode($configJson, true);
 
       $userName = $this->config['username'];

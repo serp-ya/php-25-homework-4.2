@@ -35,7 +35,7 @@ class Controller {
   public function getData() 
   {
     $newTask = $this->newTask;
-    $sortBy = $this->sortBy ?? 'id';
+    $sortBy = $this->sortBy ? $this->sortBy : 'id';
     $newDescription = $this->newDescription;
     $requestConfig = [
       'sortBy' => $sortBy,
@@ -54,7 +54,7 @@ class Controller {
     
     if ($newDescription) {
       $this->sqlConnection->changeTask($taskId, $newDescription);
-      header("Location: /");
+      header("Location: ./");
     }
 
     switch($action) {      
